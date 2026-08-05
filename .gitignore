@@ -1,0 +1,98 @@
+# Dependencies and package-manager caches
+/node_modules/
+/.pnp/
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+/.npm/
+/.pnpm-store/
+
+# Tests and coverage
+/coverage/
+/htmlcov/
+/.nyc_output/
+/playwright-report/
+/test-results/
+.coverage
+.coverage.*
+
+# Frontend build output and caches
+/.next/
+/.vinext/
+/out/
+/dist/
+/.vite/
+/.turbo/
+/.cache/
+*.tsbuildinfo
+.eslintcache
+
+# Logs and diagnostics
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+
+# Environment files and local secrets
+.env*
+!.env.example
+.dev.vars*
+!.dev.vars.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Python environments, packages, and caches
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyright/
+.hypothesis/
+.tox/
+.nox/
+*.egg-info/
+pip-wheel-metadata/
+
+# Local databases and market data
+/data/
+*.sqlite
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+*.db
+*.db-shm
+*.db-wal
+
+# Hosting and deployment state
+/.vercel/
+/.wrangler/
+
+# Generated and temporary project output
+next-env.d.ts
+/outputs/
+/work/
+/tmp/
+*.tmp
+*.temp
+
+# Editors and operating systems
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
