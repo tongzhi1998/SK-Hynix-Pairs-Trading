@@ -30,6 +30,14 @@ type ContextMarket = {
   proxy_note: string | null;
   ts: number;
   stale: boolean;
+  session: MarketSession | null;
+};
+
+type MarketSession = {
+  regular_start: number;
+  regular_end: number;
+  next_regular_start: number;
+  timezone: string;
 };
 
 type Backfill = {
@@ -123,6 +131,34 @@ function countdown(timestamp: number, now: number) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   return `${hours}h ${minutes.toString().padStart(2, "0")}m`;
+}
+
+function sessionCountdown(milliseconds: number) {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+}
+
+function MarketSessionStatus({ session, now }: { session: MarketSession | null; now: number }) {
+  if (!session) {
+    return <div className="market-session unavailable"><span>UNKNOWN</span><p>Session schedule unavailable</p></div>;
+  }
+  const isOpen = now >= session.regular_start && now < session.regular_end;
+  const transition = isOpen
+    ? session.regular_end
+    : now < session.regular_start
+      ? session.regular_start
+      : session.next_regular_start;
+  const event = isOpen ? "closes" : "opens";
+  const pendingRefresh = transition <= now;
+  return (
+    <div className={`market-session ${isOpen ? "open" : "closed"}`}>
+      <span>{isOpen ? "OPEN" : "CLOSED"}</span>
+      <p>{pendingRefresh ? "Updating schedule…" : <><b>{sessionCountdown(transition - now)}</b> until market {event}</>}</p>
+    </div>
+  );
 }
 
 function beijingClock(timestamp: number) {
@@ -649,7 +685,7 @@ export default function Dashboard() {
       <section className="context-section">
         <div className="section-heading">
           <div><p className="eyebrow">MARKET CONTEXT</p><h2>Risk tape</h2></div>
-          <span className="section-note">Korea: previous close · SPY/QQQ: trailing 24h</span>
+          <span className="section-note">Regular cash sessions · live transition countdowns</span>
         </div>
         <div className="context-grid">
           {(snapshot?.context || []).map((market) => (
@@ -657,6 +693,7 @@ export default function Dashboard() {
               <div className="context-top"><span>{market.label}</span><i className={market.stale ? "stale" : ""} /></div>
               <strong>{number(market.mark)}</strong>
               <p className={(market.change_pct ?? 0) >= 0 ? "positive" : "negative"}>{market.change_pct == null ? "—" : `${signed(market.change_pct)}%`}</p>
+              <MarketSessionStatus session={market.session} now={now} />
               <small>{market.proxy_note || market.inst_id}</small>
             </article>
           ))}

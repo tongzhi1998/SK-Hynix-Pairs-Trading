@@ -175,7 +175,15 @@ async def pair_leg(instrument) -> dict:
 
 
 async def context_market(instrument) -> dict:
-    mark = await okx.mark_price(instrument.inst_id)
+    mark_result, yahoo_result = await asyncio.gather(
+        okx.mark_price(instrument.inst_id),
+        yahoo.index_quote(instrument.label),
+        return_exceptions=True,
+    )
+    if isinstance(mark_result, BaseException):
+        raise mark_result
+    mark = mark_result
+    session = None if isinstance(yahoo_result, BaseException) else yahoo_result["session"]
     try:
         change = await okx.trailing_24h_change(
             instrument.inst_id, mark["mark"], mark["ts"]
@@ -188,9 +196,10 @@ async def context_market(instrument) -> dict:
         "inst_id": instrument.inst_id,
         "mark": mark["mark"],
         "change_pct": change,
-        "proxy_note": instrument.proxy_note,
+        "proxy_note": "OKX mark · U.S. cash session via Yahoo Finance",
         "ts": mark["ts"],
         "stale": int(time.time() * 1000) - mark["ts"] > 120_000,
+        "session": session,
     }
 
 
@@ -206,6 +215,7 @@ async def korea_index_market(instrument) -> dict:
             "proxy_note": f"Yahoo Finance · delayed quote · {instrument.symbol}",
             "ts": quote["ts"],
             "stale": False,
+            "session": quote["session"],
         }
     except Exception:  # noqa: BLE001 - external index context must not take down the pair feed
         return {
@@ -217,6 +227,7 @@ async def korea_index_market(instrument) -> dict:
             "proxy_note": "Yahoo Finance index temporarily unavailable",
             "ts": 0,
             "stale": True,
+            "session": None,
         }
 
 

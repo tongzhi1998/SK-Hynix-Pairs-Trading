@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from datetime import datetime, timedelta
 from typing import Any
 from urllib.parse import quote
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import httpx
 
@@ -51,10 +53,52 @@ def parse_index_chart(payload: dict[str, Any]) -> dict:
 
     mark = float(mark)
     previous_close = float(previous_close)
+    session = parse_market_session(meta)
     return {
         "mark": mark,
         "change_pct": (mark / previous_close - 1.0) * 100.0,
         "previous_close": previous_close,
         "ts": int(timestamp) * 1000,
         "currency": meta.get("currency") or "KRW",
+        "session": session,
     }
+
+
+def parse_market_session(meta: dict[str, Any]) -> dict | None:
+    regular = (meta.get("currentTradingPeriod") or {}).get("regular") or {}
+    start = regular.get("start")
+    end = regular.get("end")
+    timezone = meta.get("exchangeTimezoneName")
+    if start is None or end is None or not timezone:
+        return None
+
+    start_ms = int(start) * 1000
+    end_ms = int(end) * 1000
+    return {
+        "regular_start": start_ms,
+        "regular_end": end_ms,
+        "next_regular_start": next_weekday_session_start(start_ms, timezone),
+        "timezone": timezone,
+    }
+
+
+def next_weekday_session_start(start_ms: int, timezone: str) -> int:
+    try:
+        zone = ZoneInfo(timezone)
+    except ZoneInfoNotFoundError:
+        return start_ms + 24 * 60 * 60 * 1000
+
+    current = datetime.fromtimestamp(start_ms / 1000, zone)
+    next_date = current.date() + timedelta(days=1)
+    while next_date.weekday() >= 5:
+        next_date += timedelta(days=1)
+    next_start = datetime(
+        next_date.year,
+        next_date.month,
+        next_date.day,
+        current.hour,
+        current.minute,
+        current.second,
+        tzinfo=zone,
+    )
+    return int(next_start.timestamp() * 1000)

@@ -32,6 +32,8 @@ Yahoo Finance index access requires no API key but is unofficial and may be dela
 
 KOSPI and KOSDAQ percentage changes are calculated against Yahoo's previous close. SPY and QQQ use a rolling 24-hour change calculated from the current OKX mark versus the nearest five-minute OKX mark candle to exactly 24 hours earlier.
 
+Each market-context card displays the regular cash-session status and a second-by-second countdown to the next open or close. Session windows come from Yahoo Finance exchange metadata so Korean hours and U.S. daylight-saving offsets are handled independently. SPY and QQQ status refers to their U.S. cash session, not the 24/7 OKX perpetual market.
+
 ## 4. Core calculations
 
 For timestamp `t`:

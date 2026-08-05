@@ -144,11 +144,18 @@ h3 { font-size: 20px; margin-top: 5px; letter-spacing: -.03em; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .context-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 22px; }
-.context-card { border: 1px solid var(--line); padding: 19px; min-height: 150px; background: rgba(5,10,7,.34); }
+.context-card { border: 1px solid var(--line); padding: 19px; min-height: 190px; background: rgba(5,10,7,.34); }
 .context-top { color: var(--ink); font: 11px var(--font-geist-mono), monospace; }
 .context-card > strong { display: block; margin-top: 22px; font: 500 27px var(--font-geist-mono), monospace; }
 .context-card p { margin-top: 4px; font: 500 13px var(--font-geist-mono), monospace; }
 .context-card small { display: block; margin-top: 15px; color: var(--muted); font: 9px var(--font-geist-mono), monospace; }
+.market-session { display: flex; align-items: center; gap: 9px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); font: 9px var(--font-geist-mono), monospace; }
+.market-session > span { padding: 4px 6px; border: 1px solid currentColor; letter-spacing: .08em; }
+.market-session p { margin: 0; color: var(--muted); font: inherit; }
+.market-session b { color: var(--ink); font-weight: 600; }
+.market-session.open > span { color: var(--acid); }
+.market-session.closed > span { color: var(--orange); }
+.market-session.unavailable > span { color: var(--muted); }
 .placeholder { position: relative; overflow: hidden; background: #101613; }
 .placeholder::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(214,255,95,.05), transparent); animation: shimmer 1.6s infinite; }
 @keyframes shimmer { to { transform: translateX(100%); } }

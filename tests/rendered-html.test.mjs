@@ -58,7 +58,9 @@ test("keeps OKX data access in the Python service", async () => {
   assert.match(dashboard, /CURRENT RATE COLLECTS IN/);
   assert.match(dashboard, /leg\.funding\.funding_time/);
   assert.match(dashboard, /Asia\/Shanghai/);
-  assert.match(dashboard, /Korea: previous close · SPY\/QQQ: trailing 24h/);
+  assert.match(dashboard, /Regular cash sessions · live transition countdowns/);
+  assert.match(dashboard, /MarketSessionStatus/);
+  assert.match(dashboard, /until market/);
   assert.doesNotMatch(dashboard, /Korea \/ EWY proxy|EWY-USDT-SWAP/);
   assert.doesNotMatch(dashboard, /query2\.finance\.yahoo\.com/);
   assert.doesNotMatch(dashboard, /countdown\(leg\.funding\.next_funding_time/);

@@ -59,4 +59,6 @@ The initial backfill runs in the background when the Python service starts. A co
 
 KOSPI (`^KS11`) and KOSDAQ (`^KQ11`) use Yahoo Finance's delayed quote feed without an API key and show change from the previous close. This is an unofficial endpoint and may be delayed or rate-limited. SPY and QQQ continue to use OKX perpetual mark prices and show rolling 24-hour change.
 
+All four market-context cards show regular cash-session status and a live countdown to the next open/close transition. SPY and QQQ session status describes the U.S. cash market rather than the continuously traded OKX perpetuals.
+
 This application is read-only and does not submit orders.
