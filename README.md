@@ -9,6 +9,9 @@ The application uses OKX **mark price only** for contract prices. It separately 
 
 See [spec.md](spec.md) for the complete V1 specification.
 
+The current mean-reversion research, strategy rules, limitations, and reproducible
+backtest are in [research/strategy_report.md](research/strategy_report.md).
+
 ## Local setup
 
 Requires Python 3.11+, Node.js 22+, and npm.
@@ -37,6 +40,15 @@ Alternatively:
 chmod +x scripts/dev.sh
 ./scripts/dev.sh
 ```
+
+The combined launcher supervises the frontend and API as one unit. If either
+service exits, it stops the other so a stale dashboard cannot remain connected
+to a dead API. Combined startup and runtime diagnostics are written to the
+rotating `logs/error.log` file (up to 5 MB plus three backups). When the API is
+run separately, caught backend errors are written to the same file. Running
+`./scripts/dev.sh` a second time reports the existing dashboard instead of
+starting duplicates; an orphaned dashboard process from an interrupted launcher
+is cleaned up automatically.
 
 ## Tests
 

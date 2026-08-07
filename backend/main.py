@@ -19,10 +19,12 @@ from .config import (
     PAIR_INSTRUMENTS,
     PAIR_START_MS,
 )
+from .logging_config import configure_application_logging
 from .okx import OkxClient
 from .storage import Store
 from .yahoo import YahooClient
 
+logger = configure_application_logging()
 store = Store(DATABASE_PATH)
 okx = OkxClient()
 yahoo = YahooClient()
@@ -88,8 +90,9 @@ async def refresh_recent_history(*, force: bool = False) -> None:
                 last_success=int(time.time() * 1000),
                 rows_processed=sum(candle_counts) + sum(funding_counts),
             )
-        except Exception as exc:  # noqa: BLE001 - stale stored history remains available
+        except Exception as exc:
             recent_history_state["error"] = str(exc)
+            logger.exception("Recent OKX history refresh failed")
 
 
 async def recent_history_loop() -> None:
@@ -124,8 +127,9 @@ async def backfill() -> None:
             )
             backfill_state["rows_processed"] += candle_count + funding_count
         backfill_state["completed"] = True
-    except Exception as exc:  # noqa: BLE001 - surfaced through status endpoint
+    except Exception as exc:
         backfill_state["error"] = str(exc)
+        logger.exception("Initial OKX history backfill failed")
     finally:
         backfill_state["running"] = False
         backfill_state["finished_at"] = int(time.time() * 1000)
@@ -246,6 +250,7 @@ async def snapshot() -> dict:
             *(context_market(instrument) for instrument in CONTEXT_INSTRUMENTS),
         )
     except Exception as exc:
+        logger.exception("Live snapshot failed because required OKX data was unavailable")
         raise HTTPException(status_code=502, detail=f"OKX data unavailable: {exc}") from exc
 
     metrics = pair_metrics(korean["mark"], adr["mark"])
